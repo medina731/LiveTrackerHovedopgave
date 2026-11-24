@@ -1,8 +1,5 @@
-﻿using System;
+﻿namespace LiveTrackerHovedopgave.Models;
 
-public class Class1
+public class GoldenScroll
 {
-	public Class1()
-	{
-	}
 }

@@ -1,8 +1,5 @@
-﻿using System;
+﻿namespace LiveTrackerHovedopgave.Services.Repositories;
 
-public class Class1
+public class BundleRepo
 {
-	public Class1()
-	{
-	}
 }

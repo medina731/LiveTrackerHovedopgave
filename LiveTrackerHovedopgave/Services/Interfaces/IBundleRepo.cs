@@ -1,8 +1,5 @@
-﻿using System;
+﻿namespace LiveTrackerHovedopgave.Services.Interfaces;
 
-public class Class1
+public interface IBundleRepo
 {
-	public Class1()
-	{
-	}
 }

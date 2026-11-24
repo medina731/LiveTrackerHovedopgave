@@ -1,8 +1,5 @@
-﻿using System;
+﻿namespace LiveTrackerHovedopgave.Controllers;
 
-public class Class1
+public class APIController
 {
-	public Class1()
-	{
-	}
 }
