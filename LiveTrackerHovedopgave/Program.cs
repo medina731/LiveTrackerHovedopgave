@@ -22,5 +22,5 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
-
+//Hi Mikka
 app.Run();
