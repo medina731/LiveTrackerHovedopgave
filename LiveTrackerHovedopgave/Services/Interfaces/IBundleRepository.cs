@@ -5,5 +5,7 @@ namespace LiveTrackerHovedopgave.Services.Interfaces;
 public interface IBundleRepository
 {
     List<GoldenScroll> GetAll(string saveFolderName);
-    void SaveProgress(string saveFolderName, List<GoldenScroll> rooms);
+
+    // Gemmer fremskridtet for en save. Returnerer true hvis det blev gemt, false hvis saven ikke findes
+    bool SaveProgress(string saveFolderName, List<GoldenScroll> rooms);
 }
