@@ -12,7 +12,7 @@ IF OBJECT_ID('dbo.GoldenScroll', 'U') IS NOT NULL DROP TABLE dbo.GoldenScroll;
 GO
 
 -- -----------------------------------------------------
--- Table GoldenScroll
+-- Table GoldenScroll (én pr. rum)
 -- -----------------------------------------------------
 CREATE TABLE dbo.GoldenScroll (
   GoldenScrollID INT IDENTITY(1,1) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE dbo.GoldenScroll (
 GO
 
 -- -----------------------------------------------------
--- Table Bundle
+-- Table Bundle (hører til præcis én GoldenScroll)
 -- -----------------------------------------------------
 CREATE TABLE dbo.Bundle (
   BundleID INT IDENTITY(1,1) NOT NULL,
@@ -110,4 +110,3 @@ CREATE TABLE dbo.SaveSlotProgress (
 CREATE INDEX fk_SaveSlotProgress_Save1_idx ON dbo.SaveSlotProgress (Save_ID);
 CREATE INDEX fk_SaveSlotProgress_BundleItemSlot1_idx ON dbo.SaveSlotProgress (BundleItemSlot_BundleItemSlotID);
 GO
-

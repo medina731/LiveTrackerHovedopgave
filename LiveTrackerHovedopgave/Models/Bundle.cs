@@ -4,8 +4,8 @@ public class Bundle
 {
     public int BundleID { get; set; }
     public int BundleIndex { get; set; }
-    public string BundleInternalName { get; set; }
-    public string BundleName { get; set; }
+    public string BundleInternalName { get; set; } = string.Empty;
+    public string BundleName { get; set; } = string.Empty;
 
     // Komposition: slots hører til præcis ét bundle
     private List<BundleItemSlot> slots = new List<BundleItemSlot>();
