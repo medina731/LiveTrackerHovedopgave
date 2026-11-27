@@ -4,6 +4,8 @@ public class GoldenScroll
 {
     public string RoomName { get; set; }
 
+    public int GoldenScrollID { get; set; }
+
     // Aggregering: bundles hører til et rum (GoldenScroll)
     private List<Bundle> bundles = new List<Bundle>();
 
@@ -13,9 +15,10 @@ public class GoldenScroll
         get { return bundles; }
     }
 
-    public GoldenScroll(string roomName)
+    public GoldenScroll(string roomName, int goldenScrollID)
     {
         RoomName = roomName;
+        GoldenScrollID = goldenScrollID;
     }
 
     // Tilføjer et bundle til rummet

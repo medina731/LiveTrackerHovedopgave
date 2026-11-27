@@ -10,32 +10,33 @@ public class BundleRepository : IBundleRepository
     private readonly string connectionString;
     public BundleRepository(IConfiguration configuration)
     {
-        connectionString = configuration.GetConnectionString("DefaultConnection");
+        connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Mangler connection string 'DefaultConnection'");
     }
 
     // Henter rum, bundles og slots for en save i ét SELECT med JOIN
     public List<GoldenScroll> GetAll(string saveFolderName)
     {
         string sql = @"
-            SELECT g.RoomName,
-                   b.BundleID, b.BundleIndex,
-                   b.InternalName AS BundleInternalName, b.Name AS BundleName,
-                   s.BundleItemSlotID, s.BundleItemSlotIndex,
-                   CAST(COALESCE(sp.IsFilled, 0) AS BIT) AS IsFilled
-            FROM GoldenScroll g
-            JOIN Bundle b ON b.BundleID = g.Bundle_BundleID
-            JOIN BundleItemSlot_has_Bundle bs ON bs.Bundle_BundleID = b.BundleID
-            JOIN BundleItemSlot s ON s.BundleItemSlotID = bs.BundleItemSlot_BundleItemSlotID
-            LEFT JOIN Save sv ON sv.SaveFolderName = @saveFolderName
-            LEFT JOIN SaveProgress sp ON sp.SaveID = sv.SaveID
-                                     AND sp.BundleItemSlotID = s.BundleItemSlotID
-            ORDER BY g.RoomName, b.BundleIndex, s.BundleItemSlotIndex";
+                SELECT g.GoldenScrollID, g.RoomName,
+                       b.BundleID, b.BundleIndex,
+                       b.InternalName AS BundleInternalName, b.Name AS BundleName,
+                       s.BundleItemSlotID, s.BundleItemSlotIndex,
+                       CAST(COALESCE(sp.IsFilled, 0) AS BIT) AS IsFilled
+                FROM GoldenScroll g
+                JOIN Bundle b ON b.GoldenScroll_GoldenScrollID = g.GoldenScrollID
+                JOIN BundleItemSlot_has_Bundle bs ON bs.Bundle_BundleID = b.BundleID
+                JOIN BundleItemSlot s ON s.BundleItemSlotID = bs.BundleItemSlot_BundleItemSlotID
+                LEFT JOIN Save sv ON sv.SaveFolderName = @saveFolderName
+                LEFT JOIN SaveProgress sp ON sp.SaveID = sv.SaveID
+                                         AND sp.BundleItemSlotID = s.BundleItemSlotID
+                ORDER BY g.GoldenScrollID, b.BundleIndex, s.BundleItemSlotIndex";
 
         //Hjælpe Variabler.
         List<GoldenScroll> rooms = new List<GoldenScroll>();
         GoldenScroll? currentRoom = null;
         Bundle? currentBundle = null;
-        string? currentRoomName = null;
+        int? currentGoldenScrollID = null;
         int? currentBundleID = -1;
 
         using (SqlConnection connection = new SqlConnection(connectionString))
@@ -48,16 +49,17 @@ public class BundleRepository : IBundleRepository
             {
                 while (reader.Read())
                 {
-                    string roomName = (string)reader["RoomName"];
+                    int goldenScrollID = (int)reader["GoldenScrollID"];
                     int bundleID = (int)reader["BundleID"];
 
-                    // Nyt rum, når RoomName skifter
-                    bool sameRoom = roomName == currentRoomName;
+                    // Nyt rum, når GoldenScrollID skifter
+                    bool sameRoom = goldenScrollID == currentGoldenScrollID;
                     if (sameRoom == false)
                     {
-                        currentRoom = new GoldenScroll(roomName);
+                        string roomName = (string)reader["RoomName"];
+                        currentRoom = new GoldenScroll(roomName, goldenScrollID);
                         rooms.Add(currentRoom);
-                        currentRoomName = roomName;
+                        currentGoldenScrollID = goldenScrollID;
                     }
 
                     // Nyt bundle, når BundleID skifter ( object initializer new bundle)
@@ -71,11 +73,11 @@ public class BundleRepository : IBundleRepository
                             BundleInternalName = (string)reader["BundleInternalName"],
                             BundleName = (string)reader["BundleName"]
                         };
-                        currentRoom.AddBundle(currentBundle);
+                        currentRoom?.AddBundle(currentBundle);
                         currentBundleID = bundleID;
                     }
 
-                    currentBundle.AddSlot(new BundleItemSlot
+                    currentBundle?.AddSlot(new BundleItemSlot
                     {
                         BundleItemSlotID = (int)reader["BundleItemSlotID"],
                         BundleItemSlotIndex = (int)reader["BundleItemSlotIndex"],
